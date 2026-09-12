@@ -21,24 +21,27 @@ def render_question_input(example_questions: List[str]) -> Optional[str]:
     """Render the question input section and return the question or None."""
     st.subheader("Ask Your Question")
     
-    # Quick example buttons
-    st.markdown("**Example questions:**")
-    cols = st.columns(len(example_questions))
+    # Quick example buttons - Fixed to properly update text area
+    st.markdown("**📌 Quick Examples - Click any below:**")
+    cols = st.columns(4)
     for i, example in enumerate(example_questions):
-        with cols[i % len(cols)]:
-            if st.button(example, key=f"example_{i}", use_container_width=True):
+        with cols[i % 4]:
+            if st.button(example, key=f"example_{i}", use_container_width=True, help="Click to fill the question"):
                 st.session_state.user_question = example
+                st.rerun()
     
-    # Main question input
+    # Main question input with better styling
+    st.markdown("**✍️ Your Question:**")
     question = st.text_area(
         "What would you like to know about permits?",
         value=st.session_state.get("user_question", ""),
-        height=100,
+        height=120,
         placeholder="e.g., What permits do I need to open a restaurant?",
         key="question_input",
     )
     
-    col1, col2 = st.columns([0.2, 0.8])
+    # Beautiful search button
+    col1, col2, col3 = st.columns([0.15, 0.7, 0.15])
     with col1:
         search_clicked = st.button("🔍 Search", use_container_width=True, type="primary")
     
@@ -71,42 +74,98 @@ def render_required_steps(steps: List[Dict[str, Any]]):
     
     st.subheader("✅ Required Steps")
     
-    for item in steps:
-        step_num = item.get("step", "")
+    for idx, item in enumerate(steps, 1):
+        step_num = item.get("step", idx)
         requirement = item.get("requirement", "")
         department = item.get("department")
         cost = item.get("cost")
         timeline = item.get("timeline")
         source = item.get("source", "Unknown")
         
-        # Card-like container for each step
+        # Beautiful step card with number badge
         with st.container():
-            col1, col2 = st.columns([0.05, 0.95])
+            col1, col2 = st.columns([0.08, 0.92])
+            
             with col1:
-                st.markdown(f"### {step_num}")
+                st.markdown(f"""
+                    <div style="
+                        background: linear-gradient(135deg, #1f5ba8 0%, #2a6fbf 100%);
+                        color: white;
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-weight: bold;
+                        font-size: 1.5rem;
+                        box-shadow: 0 4px 12px rgba(31, 91, 168, 0.3);
+                    ">
+                        {step_num}
+                    </div>
+                """, unsafe_allow_html=True)
+            
             with col2:
                 st.markdown(f"**{requirement}**")
             
-            # Details in a nice layout
+            # Details in beautiful columns
             col1, col2, col3 = st.columns(3)
             
             with col1:
                 if department:
-                    st.markdown(f"🏢 **{department}**")
-                    st.caption("Department")
+                    st.markdown(f"""
+                        <div style="
+                            background: linear-gradient(135deg, #e7f3ff 0%, #f0f7ff 100%);
+                            padding: 0.8rem;
+                            border-radius: 8px;
+                            border-left: 4px solid #1f5ba8;
+                        ">
+                            <p style="margin: 0; color: #1f5ba8; font-weight: 600; font-size: 0.85rem;">🏢 DEPARTMENT</p>
+                            <p style="margin: 0.5rem 0 0 0; color: #333; font-weight: 600;">{department}</p>
+                        </div>
+                    """, unsafe_allow_html=True)
             
             with col2:
                 if cost:
-                    st.markdown(f"💰 **{cost}**")
-                    st.caption("Cost")
+                    st.markdown(f"""
+                        <div style="
+                            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+                            padding: 0.8rem;
+                            border-radius: 8px;
+                            border-left: 4px solid #28a745;
+                        ">
+                            <p style="margin: 0; color: #28a745; font-weight: 600; font-size: 0.85rem;">💰 COST</p>
+                            <p style="margin: 0.5rem 0 0 0; color: #333; font-weight: 600;">{cost}</p>
+                        </div>
+                    """, unsafe_allow_html=True)
             
             with col3:
                 if timeline:
-                    st.markdown(f"⏱️ **{timeline}**")
-                    st.caption("Timeline")
+                    st.markdown(f"""
+                        <div style="
+                            background: linear-gradient(135deg, #fff9e6 0%, #fffbf0 100%);
+                            padding: 0.8rem;
+                            border-radius: 8px;
+                            border-left: 4px solid #ff9800;
+                        ">
+                            <p style="margin: 0; color: #ff9800; font-weight: 600; font-size: 0.85rem;">⏱️ TIMELINE</p>
+                            <p style="margin: 0.5rem 0 0 0; color: #333; font-weight: 600;">{timeline}</p>
+                        </div>
+                    """, unsafe_allow_html=True)
             
-            # Source citation
-            st.caption(f"📚 **Source:** {source}")
+            # Source citation in a beautiful box
+            st.markdown(f"""
+                <div style="
+                    background: linear-gradient(135deg, #f5f9fd 0%, #f0f6fc 100%);
+                    padding: 1rem;
+                    border-radius: 8px;
+                    margin-top: 1rem;
+                    border: 1px solid #dde8f0;
+                ">
+                    <p style="margin: 0; color: #1f5ba8; font-weight: 600; font-size: 0.9rem;">📚 SOURCE: <span style="color: #666;">{source}</span></p>
+                </div>
+            """, unsafe_allow_html=True)
+            
             st.divider()
 
 
