@@ -263,8 +263,6 @@ def initialize_session_state():
         st.session_state.user_question = ""
     if "last_response" not in st.session_state:
         st.session_state.last_response = None
-    if "processing" not in st.session_state:
-        st.session_state.processing = False
 
 
 def main():
