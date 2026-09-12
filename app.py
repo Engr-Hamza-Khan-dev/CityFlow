@@ -281,8 +281,12 @@ def main():
         )
         return
 
+    # Display results ABOVE input if available
+    if st.session_state.last_response:
+        render_response(st.session_state.last_response)
+        st.divider()
+
     # Question input section
-    st.divider()
     question = components.render_question_input(EXAMPLE_QUESTIONS)
 
     # Process question if submitted
@@ -293,17 +297,13 @@ def main():
             try:
                 response = service.process_question(question)
                 st.session_state.last_response = response
+                st.rerun()  # Refresh to show results above
             except Exception as e:
                 components.render_error(f"Error processing question: {str(e)}")
                 st.session_state.processing = False
                 return
 
         st.session_state.processing = False
-    
-    # Display results if available
-    if st.session_state.last_response:
-        st.divider()
-        render_response(st.session_state.last_response)
 
 
 def render_response(response):
