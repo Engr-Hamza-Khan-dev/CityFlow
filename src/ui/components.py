@@ -21,17 +21,6 @@ def render_question_input(example_questions: List[str]) -> Optional[str]:
     """Render the question input section and return the question or None."""
     st.subheader("Ask Your Question")
     
-    # Quick example buttons
-    st.markdown("**📌 Quick Examples:**")
-    cols = st.columns(4)
-    for i, example in enumerate(example_questions):
-        with cols[i % 4]:
-            if st.button(example, key=f"example_btn_{i}", use_container_width=True):
-                # Clear and set new question
-                st.session_state.clear()
-                st.session_state.user_question = example
-                st.rerun()
-    
     st.markdown("")  # Spacing
     
     # Main question input
