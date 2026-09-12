@@ -21,23 +21,26 @@ def render_question_input(example_questions: List[str]) -> Optional[str]:
     """Render the question input section and return the question or None."""
     st.subheader("Ask Your Question")
     
-    # Quick example buttons - Fixed to properly update text area
-    st.markdown("**📌 Quick Examples - Click any below:**")
+    # Quick example buttons
+    st.markdown("**📌 Quick Examples:**")
     cols = st.columns(4)
     for i, example in enumerate(example_questions):
         with cols[i % 4]:
-            if st.button(example, key=f"example_{i}", use_container_width=True, help="Click to fill the question"):
+            if st.button(example, key=f"example_{i}", use_container_width=True):
                 st.session_state.user_question = example
                 st.rerun()
     
-    # Main question input with better styling
+    st.markdown("")  # Spacing
+    
+    # Main question input
     st.markdown("**✍️ Your Question:**")
     question = st.text_area(
-        "What would you like to know about permits?",
+        label="question_label",
         value=st.session_state.get("user_question", ""),
         height=120,
         placeholder="e.g., What permits do I need to open a restaurant?",
         key="question_input",
+        label_visibility="collapsed"
     )
     
     # Beautiful search button
