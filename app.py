@@ -45,10 +45,10 @@ st.markdown("""
         
         /* Container padding and max width */
         .block-container {
-            padding-top: 2.5rem !important;
-            padding-bottom: 2.5rem !important;
-            padding-left: 4rem !important;
-            padding-right: 4rem !important;
+            padding-top: 1.5rem !important;
+            padding-bottom: 1.5rem !important;
+            padding-left: 3rem !important;
+            padding-right: 3rem !important;
             max-width: 1100px !important;
         }
         
@@ -66,8 +66,8 @@ st.markdown("""
             color: #1f5ba8 !important;
             font-weight: 700 !important;
             font-size: 1.8rem !important;
-            margin-top: 2rem !important;
-            margin-bottom: 1rem !important;
+            margin-top: 1rem !important;
+            margin-bottom: 0.8rem !important;
             border-bottom: 3px solid #1f5ba8 !important;
             padding-bottom: 0.5rem !important;
         }
@@ -98,9 +98,11 @@ st.markdown("""
         
         /* Text areas */
         .stTextArea label {
-            font-weight: 600 !important;
-            color: #1f5ba8 !important;
-            margin-bottom: 0.5rem !important;
+            display: none !important;
+        }
+        
+        .stTextArea {
+            width: 100% !important;
         }
         
         .stTextArea textarea {
@@ -111,12 +113,18 @@ st.markdown("""
             background-color: #fafbfc !important;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
             transition: all 0.3s ease !important;
+            color: #333 !important;
+            font-weight: 500 !important;
         }
         
         .stTextArea textarea:focus {
             border: 2px solid #1f5ba8 !important;
             box-shadow: 0 0 0 4px rgba(31, 91, 168, 0.15) !important;
             background-color: #ffffff !important;
+        }
+        
+        .stTextArea textarea::placeholder {
+            color: #999 !important;
         }
         
         /* Buttons */
@@ -192,7 +200,7 @@ st.markdown("""
         
         /* Dividers */
         hr {
-            margin: 2.5rem 0 !important;
+            margin: 1.5rem 0 !important;
             border: none !important;
             height: 2px !important;
             background: linear-gradient(90deg, transparent, #dde8f0, transparent) !important;
