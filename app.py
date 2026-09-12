@@ -28,217 +28,201 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Custom CSS for beautiful UI
+# Premium Professional CSS
 st.markdown("""
     <style>
-        /* Overall styling */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         
-        /* Main background - beautiful light gradient */
+        /* Main background - premium gradient */
         .main {
-            background: linear-gradient(135deg, #f5f7fa 0%, #f0f4f8 100%);
+            background: linear-gradient(180deg, #f5f7fc 0%, #eef2f9 100%);
         }
         
-        /* Container padding and max width */
+        /* Container */
         .block-container {
-            padding-top: 1.5rem !important;
-            padding-bottom: 1.5rem !important;
-            padding-left: 3rem !important;
-            padding-right: 3rem !important;
-            max-width: 1100px !important;
+            padding-top: 2rem !important;
+            padding-bottom: 2rem !important;
+            padding-left: 2.5rem !important;
+            padding-right: 2.5rem !important;
+            max-width: 1200px !important;
         }
         
-        /* Header styling */
+        /* Headers - Professional bold styling */
         h1 {
             color: #0f3a7d !important;
-            font-weight: 800 !important;
-            font-size: 3rem !important;
+            font-weight: 900 !important;
+            font-size: 2.8rem !important;
             margin-bottom: 0.3rem !important;
-            text-shadow: 0 2px 4px rgba(15, 58, 125, 0.1) !important;
-            letter-spacing: -1px !important;
+            letter-spacing: -0.5px !important;
         }
         
         h2 {
             color: #1f5ba8 !important;
             font-weight: 700 !important;
-            font-size: 1.8rem !important;
-            margin-top: 1rem !important;
-            margin-bottom: 0.8rem !important;
-            border-bottom: 3px solid #1f5ba8 !important;
-            padding-bottom: 0.5rem !important;
+            font-size: 1.6rem !important;
+            margin-top: 1.5rem !important;
+            margin-bottom: 1rem !important;
         }
         
         h3 {
             color: #2a6fbf !important;
-            font-weight: 600 !important;
-            font-size: 1.3rem !important;
-            margin-top: 1.5rem !important;
+            font-weight: 700 !important;
+            font-size: 1.2rem !important;
+            margin-top: 1rem !important;
             margin-bottom: 0.8rem !important;
         }
         
-        /* Subtitle and description */
+        /* Subtitle */
         .subtitle {
             color: #2a6fbf !important;
-            font-size: 1.5rem !important;
-            font-weight: 600 !important;
-            margin: 0.5rem 0 0.3rem 0 !important;
-            letter-spacing: 0.3px !important;
+            font-size: 1.4rem !important;
+            font-weight: 700 !important;
+            margin: 0.3rem 0 0.5rem 0 !important;
         }
         
         .description {
             color: #666 !important;
-            font-size: 1.1rem !important;
-            margin: 0.5rem 0 2rem 0 !important;
-            line-height: 1.6 !important;
+            font-size: 1rem !important;
+            margin: 0.5rem 0 0 0 !important;
+            line-height: 1.5 !important;
         }
         
-        /* Text areas */
+        /* Text areas - Premium */
         .stTextArea label {
             display: none !important;
         }
         
-        .stTextArea {
-            width: 100% !important;
-        }
-        
         .stTextArea textarea {
-            border: 2px solid #dde8f0 !important;
+            border: 2px solid #d0dce6 !important;
             border-radius: 12px !important;
-            font-size: 1rem !important;
-            padding: 1rem !important;
-            background-color: #fafbfc !important;
+            font-size: 1.05rem !important;
+            padding: 1.2rem !important;
+            background-color: white !important;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
-            transition: all 0.3s ease !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
             color: #333 !important;
             font-weight: 500 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
         }
         
         .stTextArea textarea:focus {
             border: 2px solid #1f5ba8 !important;
-            box-shadow: 0 0 0 4px rgba(31, 91, 168, 0.15) !important;
-            background-color: #ffffff !important;
+            box-shadow: 0 0 0 4px rgba(31, 91, 168, 0.1), 0 4px 12px rgba(31, 91, 168, 0.15) !important;
+            background-color: #fafbfc !important;
         }
         
         .stTextArea textarea::placeholder {
-            color: #999 !important;
+            color: #aaa !important;
         }
         
-        /* Buttons */
+        /* Buttons - Premium gradient */
         .stButton > button {
             background: linear-gradient(135deg, #1f5ba8 0%, #2a6fbf 50%, #1f5ba8 100%) !important;
             color: white !important;
             border: none !important;
             border-radius: 10px !important;
-            padding: 0.75rem 1.5rem !important;
+            padding: 0.9rem 2rem !important;
             font-weight: 700 !important;
-            font-size: 1rem !important;
+            font-size: 1.05rem !important;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            box-shadow: 0 4px 12px rgba(31, 91, 168, 0.25) !important;
-            letter-spacing: 0.3px !important;
+            box-shadow: 0 4px 15px rgba(31, 91, 168, 0.3) !important;
+            letter-spacing: 0.5px !important;
             text-transform: uppercase !important;
             cursor: pointer !important;
         }
         
         .stButton > button:hover {
-            transform: translateY(-3px) !important;
-            box-shadow: 0 6px 20px rgba(31, 91, 168, 0.4) !important;
-            background: linear-gradient(135deg, #2a6fbf 0%, #3476d0 50%, #2a6fbf 100%) !important;
+            transform: translateY(-4px) !important;
+            box-shadow: 0 8px 25px rgba(31, 91, 168, 0.4) !important;
+            background: linear-gradient(135deg, #2a6fbf 0%, #3477d8 50%, #2a6fbf 100%) !important;
         }
         
         .stButton > button:active {
             transform: translateY(-1px) !important;
-            box-shadow: 0 2px 8px rgba(31, 91, 168, 0.3) !important;
         }
         
-        /* Info boxes */
+        /* Info boxes - Premium card style */
         .stInfo {
-            background: linear-gradient(135deg, #e7f3ff 0%, #f0f7ff 100%) !important;
+            background: linear-gradient(135deg, #f0f7ff 0%, #e8f2ff 100%) !important;
             border-left: 5px solid #1f5ba8 !important;
-            border-radius: 10px !important;
+            border-radius: 12px !important;
             padding: 1.5rem !important;
             color: #1f5ba8 !important;
             font-weight: 500 !important;
-            box-shadow: 0 2px 8px rgba(31, 91, 168, 0.1) !important;
+            box-shadow: 0 2px 12px rgba(31, 91, 168, 0.1) !important;
+            margin: 1rem 0 !important;
         }
         
         /* Warning boxes */
         .stWarning {
             background: linear-gradient(135deg, #fff9e6 0%, #fffbf0 100%) !important;
             border-left: 5px solid #ff9800 !important;
-            border-radius: 10px !important;
+            border-radius: 12px !important;
             padding: 1.5rem !important;
             color: #e65100 !important;
             font-weight: 500 !important;
-            box-shadow: 0 2px 8px rgba(255, 152, 0, 0.1) !important;
+            box-shadow: 0 2px 12px rgba(255, 152, 0, 0.1) !important;
+            margin: 1rem 0 !important;
         }
         
         /* Error boxes */
         .stError {
             background: linear-gradient(135deg, #ffebee 0%, #fff5f5 100%) !important;
             border-left: 5px solid #dc3545 !important;
-            border-radius: 10px !important;
+            border-radius: 12px !important;
             padding: 1.5rem !important;
             color: #b71c1c !important;
             font-weight: 500 !important;
-            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.1) !important;
-        }
-        
-        /* Success boxes */
-        .stSuccess {
-            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%) !important;
-            border-left: 5px solid #28a745 !important;
-            border-radius: 10px !important;
-            padding: 1.5rem !important;
-            color: #1b5e20 !important;
-            font-weight: 500 !important;
-            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.1) !important;
+            box-shadow: 0 2px 12px rgba(220, 53, 69, 0.1) !important;
+            margin: 1rem 0 !important;
         }
         
         /* Dividers */
         hr {
-            margin: 1.5rem 0 !important;
+            margin: 2rem 0 !important;
             border: none !important;
-            height: 2px !important;
-            background: linear-gradient(90deg, transparent, #dde8f0, transparent) !important;
+            height: 1px !important;
+            background: linear-gradient(90deg, transparent, #d0dce6, transparent) !important;
         }
         
-        /* Expanders */
+        /* Expanders - Premium */
         .streamlit-expanderHeader {
-            background: linear-gradient(135deg, #f5f9fd 0%, #f0f6fc 100%) !important;
+            background: linear-gradient(135deg, #f8fafb 0%, #f5f8fc 100%) !important;
             border-radius: 10px !important;
-            border: 1px solid #dde8f0 !important;
+            border: 1px solid #e0e8f0 !important;
             padding: 1rem !important;
             transition: all 0.3s ease !important;
+            font-weight: 600 !important;
+            color: #1f5ba8 !important;
         }
         
         .streamlit-expanderHeader:hover {
-            background: linear-gradient(135deg, #eef5fb 0%, #e8f2fa 100%) !important;
+            background: linear-gradient(135deg, #f0f5fb 0%, #eaf0f9 100%) !important;
             border-color: #1f5ba8 !important;
-            box-shadow: 0 2px 8px rgba(31, 91, 168, 0.1) !important;
+            box-shadow: 0 2px 12px rgba(31, 91, 168, 0.12) !important;
         }
         
         /* Text styling */
         p {
-            color: #333 !important;
+            color: #444 !important;
             line-height: 1.8 !important;
             font-size: 1rem !important;
         }
         
-        /* Caption text */
+        strong {
+            color: #1f5ba8 !important;
+            font-weight: 700 !important;
+        }
+        
+        /* Caption */
         .stCaption {
             color: #888 !important;
             font-size: 0.9rem !important;
             font-weight: 500 !important;
-        }
-        
-        /* Markdown bold text */
-        strong {
-            color: #1f5ba8 !important;
-            font-weight: 700 !important;
         }
         
         /* Links */
@@ -247,6 +231,7 @@ st.markdown("""
             text-decoration: none !important;
             transition: all 0.3s ease !important;
             border-bottom: 2px solid transparent !important;
+            font-weight: 600 !important;
         }
         
         a:hover {
@@ -291,8 +276,6 @@ def main():
 
     # Process question if submitted
     if question:
-        st.session_state.processing = True
-        
         with st.spinner("Processing your question..."):
             try:
                 response = service.process_question(question)
@@ -300,10 +283,7 @@ def main():
                 st.rerun()  # Refresh to show results above
             except Exception as e:
                 components.render_error(f"Error processing question: {str(e)}")
-                st.session_state.processing = False
                 return
-
-        st.session_state.processing = False
 
 
 def render_response(response):
