@@ -26,7 +26,9 @@ def render_question_input(example_questions: List[str]) -> Optional[str]:
     cols = st.columns(4)
     for i, example in enumerate(example_questions):
         with cols[i % 4]:
-            if st.button(example, key=f"example_{i}", use_container_width=True):
+            if st.button(example, key=f"example_btn_{i}", use_container_width=True):
+                # Clear and set new question
+                st.session_state.clear()
                 st.session_state.user_question = example
                 st.rerun()
     
@@ -34,19 +36,26 @@ def render_question_input(example_questions: List[str]) -> Optional[str]:
     
     # Main question input
     st.markdown("**✍️ Your Question:**")
+    
+    # Get current value from session state
+    current_question = st.session_state.get("user_question", "")
+    
     question = st.text_area(
-        label="question_label",
-        value=st.session_state.get("user_question", ""),
+        label="question_input_label",
+        value=current_question,
         height=120,
         placeholder="e.g., What permits do I need to open a restaurant?",
-        key="question_input",
+        key="question_textarea",
         label_visibility="collapsed"
     )
+    
+    # Store in session state whenever it changes
+    st.session_state.user_question = question
     
     # Beautiful search button
     col1, col2, col3 = st.columns([0.15, 0.7, 0.15])
     with col1:
-        search_clicked = st.button("🔍 Search", use_container_width=True, type="primary")
+        search_clicked = st.button("🔍 Search", use_container_width=True, type="primary", key="search_btn")
     
     if search_clicked and question.strip():
         return question.strip()
