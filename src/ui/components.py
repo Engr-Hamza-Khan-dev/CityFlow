@@ -85,88 +85,51 @@ def render_required_steps(steps: List[Dict[str, Any]]):
         department = item.get("department")
         cost = item.get("cost")
         timeline = item.get("timeline")
-        source = item.get("source", "Unknown")
         
         # Get color for this step (cycle through colors)
         color = step_colors[idx % len(step_colors)]
+        primary_color = color['primary']
+        light_color = color['light']
         
-        # Build the HTML content
-        html_content = f"""
-            <div style="
-                background: white;
-                padding: 1.2rem;
-                border-radius: 8px;
-                border-left: 5px solid {color['primary']};
-                margin-bottom: 1rem;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-            ">
-                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-                    <div style="
-                        background: linear-gradient(135deg, {color['primary']} 0%, {color['primary']}dd 100%);
-                        color: white;
-                        width: 40px;
-                        height: 40px;
-                        border-radius: 50%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        font-weight: bold;
-                        font-size: 1.2rem;
-                        flex-shrink: 0;
-                    ">
-                        {step_num}
-                    </div>
-                    <p style="margin: 0; color: #1e293b; font-weight: 700; font-size: 1rem;">{requirement}</p>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; margin-top: 1rem;">
-        """
+        # Build HTML with proper escaping
+        html_parts = []
+        
+        # Main card container opening
+        html_parts.append(f'<div style="background:white;padding:1.2rem;border-radius:8px;border-left:5px solid {primary_color};margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,0.08)">')
+        
+        # Header with number and requirement
+        html_parts.append(f'<div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">')
+        html_parts.append(f'<div style="background:linear-gradient(135deg,{primary_color} 0%,{primary_color}dd 100%);color:white;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:1.2rem;flex-shrink:0">{step_num}</div>')
+        html_parts.append(f'<p style="margin:0;color:#1e293b;font-weight:700;font-size:1rem">{requirement}</p>')
+        html_parts.append('</div>')
+        
+        # Grid for details (dept, cost, timeline)
+        html_parts.append('<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;margin-top:1rem">')
         
         if department:
-            html_content += f"""
-                    <div style="
-                        background: {color['light']};
-                        padding: 0.8rem;
-                        border-radius: 6px;
-                        border-left: 3px solid {color['primary']};
-                    ">
-                        <p style="margin: 0; color: {color['primary']}; font-weight: 700; font-size: 0.75rem; text-transform: uppercase;">🏢 Dept</p>
-                        <p style="margin: 0.5rem 0 0 0; color: #1e293b; font-weight: 600; font-size: 0.9rem;">{department}</p>
-                    </div>
-            """
+            html_parts.append(f'<div style="background:{light_color};padding:0.8rem;border-radius:6px;border-left:3px solid {primary_color}">')
+            html_parts.append(f'<p style="margin:0;color:{primary_color};font-weight:700;font-size:0.75rem;text-transform:uppercase">🏢 Dept</p>')
+            html_parts.append(f'<p style="margin:0.5rem 0 0 0;color:#1e293b;font-weight:600;font-size:0.9rem">{department}</p>')
+            html_parts.append('</div>')
         
         if cost:
-            html_content += f"""
-                    <div style="
-                        background: {color['light']};
-                        padding: 0.8rem;
-                        border-radius: 6px;
-                        border-left: 3px solid {color['primary']};
-                    ">
-                        <p style="margin: 0; color: {color['primary']}; font-weight: 700; font-size: 0.75rem; text-transform: uppercase;">💰 Cost</p>
-                        <p style="margin: 0.5rem 0 0 0; color: #1e293b; font-weight: 600; font-size: 0.9rem;">{cost}</p>
-                    </div>
-            """
+            html_parts.append(f'<div style="background:{light_color};padding:0.8rem;border-radius:6px;border-left:3px solid {primary_color}">')
+            html_parts.append(f'<p style="margin:0;color:{primary_color};font-weight:700;font-size:0.75rem;text-transform:uppercase">💰 Cost</p>')
+            html_parts.append(f'<p style="margin:0.5rem 0 0 0;color:#1e293b;font-weight:600;font-size:0.9rem">{cost}</p>')
+            html_parts.append('</div>')
         
         if timeline:
-            html_content += f"""
-                    <div style="
-                        background: {color['light']};
-                        padding: 0.8rem;
-                        border-radius: 6px;
-                        border-left: 3px solid {color['primary']};
-                    ">
-                        <p style="margin: 0; color: {color['primary']}; font-weight: 700; font-size: 0.75rem; text-transform: uppercase;">⏱️ Time</p>
-                        <p style="margin: 0.5rem 0 0 0; color: #1e293b; font-weight: 600; font-size: 0.9rem;">{timeline}</p>
-                    </div>
-            """
+            html_parts.append(f'<div style="background:{light_color};padding:0.8rem;border-radius:6px;border-left:3px solid {primary_color}">')
+            html_parts.append(f'<p style="margin:0;color:{primary_color};font-weight:700;font-size:0.75rem;text-transform:uppercase">⏱️ Time</p>')
+            html_parts.append(f'<p style="margin:0.5rem 0 0 0;color:#1e293b;font-weight:600;font-size:0.9rem">{timeline}</p>')
+            html_parts.append('</div>')
         
-        html_content += """
-                </div>
-            </div>
-        """
+        # Close grids and main container
+        html_parts.append('</div>')
+        html_parts.append('</div>')
         
-        st.markdown(html_content, unsafe_allow_html=True)
+        # Render complete HTML
+        st.markdown(''.join(html_parts), unsafe_allow_html=True)
 
 
 def render_required_documents(documents: List[str]):
