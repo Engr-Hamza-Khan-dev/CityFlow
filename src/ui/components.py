@@ -65,31 +65,44 @@ def render_permit_summary(summary: str):
 
 
 def render_required_steps(steps: List[Dict[str, Any]]):
-    """Render the required steps checklist with details from Member 2's agent."""
+    """Render the required steps checklist with different professional colors for each step."""
     if not steps:
         return
     
-    for idx, item in enumerate(steps, 1):
-        step_num = item.get("step", idx)
+    # Color palette for steps - professional colors
+    step_colors = [
+        {"primary": "#2563eb", "light": "#dbeafe"},      # Blue
+        {"primary": "#059669", "light": "#d1fae5"},      # Emerald
+        {"primary": "#7c3aed", "light": "#ede9fe"},      # Violet
+        {"primary": "#dc2626", "light": "#fee2e2"},      # Red
+        {"primary": "#d97706", "light": "#fef3c7"},      # Amber
+        {"primary": "#0891b2", "light": "#cffafe"},      # Cyan
+    ]
+    
+    for idx, item in enumerate(steps):
+        step_num = item.get("step", idx + 1)
         requirement = item.get("requirement", "")
         department = item.get("department")
         cost = item.get("cost")
         timeline = item.get("timeline")
         source = item.get("source", "Unknown")
         
-        # Beautiful step card
+        # Get color for this step (cycle through colors)
+        color = step_colors[idx % len(step_colors)]
+        
+        # Beautiful step card with professional color
         st.markdown(f"""
             <div style="
                 background: white;
                 padding: 1.2rem;
                 border-radius: 8px;
-                border-left: 4px solid #2563eb;
+                border-left: 5px solid {color['primary']};
                 margin-bottom: 1rem;
                 box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
             ">
                 <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
                     <div style="
-                        background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+                        background: linear-gradient(135deg, {color['primary']} 0%, {color['primary']}dd 100%);
                         color: white;
                         width: 40px;
                         height: 40px;
@@ -112,12 +125,12 @@ def render_required_steps(steps: List[Dict[str, Any]]):
         if department:
             st.markdown(f"""
                     <div style="
-                        background: #f0f9ff;
+                        background: {color['light']};
                         padding: 0.8rem;
                         border-radius: 6px;
-                        border-left: 3px solid #2563eb;
+                        border-left: 3px solid {color['primary']};
                     ">
-                        <p style="margin: 0; color: #2563eb; font-weight: 700; font-size: 0.75rem; text-transform: uppercase;">🏢 Dept</p>
+                        <p style="margin: 0; color: {color['primary']}; font-weight: 700; font-size: 0.75rem; text-transform: uppercase;">🏢 Dept</p>
                         <p style="margin: 0.5rem 0 0 0; color: #1e293b; font-weight: 600; font-size: 0.9rem;">{department}</p>
                     </div>
             """, unsafe_allow_html=True)
@@ -125,12 +138,12 @@ def render_required_steps(steps: List[Dict[str, Any]]):
         if cost:
             st.markdown(f"""
                     <div style="
-                        background: #f0fdf4;
+                        background: {color['light']};
                         padding: 0.8rem;
                         border-radius: 6px;
-                        border-left: 3px solid #10b981;
+                        border-left: 3px solid {color['primary']};
                     ">
-                        <p style="margin: 0; color: #10b981; font-weight: 700; font-size: 0.75rem; text-transform: uppercase;">💰 Cost</p>
+                        <p style="margin: 0; color: {color['primary']}; font-weight: 700; font-size: 0.75rem; text-transform: uppercase;">💰 Cost</p>
                         <p style="margin: 0.5rem 0 0 0; color: #1e293b; font-weight: 600; font-size: 0.9rem;">{cost}</p>
                     </div>
             """, unsafe_allow_html=True)
@@ -138,12 +151,12 @@ def render_required_steps(steps: List[Dict[str, Any]]):
         if timeline:
             st.markdown(f"""
                     <div style="
-                        background: #fef3c7;
+                        background: {color['light']};
                         padding: 0.8rem;
                         border-radius: 6px;
-                        border-left: 3px solid #f59e0b;
+                        border-left: 3px solid {color['primary']};
                     ">
-                        <p style="margin: 0; color: #f59e0b; font-weight: 700; font-size: 0.75rem; text-transform: uppercase;">⏱️ Time</p>
+                        <p style="margin: 0; color: {color['primary']}; font-weight: 700; font-size: 0.75rem; text-transform: uppercase;">⏱️ Time</p>
                         <p style="margin: 0.5rem 0 0 0; color: #1e293b; font-weight: 600; font-size: 0.9rem;">{timeline}</p>
                     </div>
             """, unsafe_allow_html=True)

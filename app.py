@@ -240,18 +240,22 @@ def initialize_session_state():
 
 def render_header_with_badge():
     """Render the CityFlow header with connection badge."""
-    col1, col2, col3 = st.columns([0.15, 0.7, 0.15])
+    col1, col2, col3 = st.columns([0.1, 0.8, 0.1])
     
     with col1:
-        st.markdown("### 🏛️")
+        st.markdown("<div style='font-size: 3rem; text-align: center;'>🏛️</div>", unsafe_allow_html=True)
     
     with col2:
-        st.markdown("<h1>CityFlow</h1>", unsafe_allow_html=True)
-        st.markdown('<p class="subtitle">AI-Powered Permit Navigator</p>', unsafe_allow_html=True)
+        st.markdown("""
+            <div>
+                <h1 style="color: #1e40af; margin: 0; font-size: 3rem; font-weight: 900;">CityFlow</h1>
+                <p style="color: #64748b; margin: 0.3rem 0 0 0; font-size: 0.95rem;">AI-Powered Permit Navigator</p>
+            </div>
+        """, unsafe_allow_html=True)
     
     with col3:
         st.markdown("""
-            <div style="text-align: right; padding-top: 0.5rem;">
+            <div style="text-align: right; padding-top: 0.8rem;">
                 <span class="connection-badge">
                     <span class="connection-dot"></span> Connected
                 </span>
@@ -278,14 +282,16 @@ def main():
         )
         return
 
-    # Display results ABOVE input if available
-    if st.session_state.last_response:
-        st.markdown("### 💡 Your Permit Information")
+    # If no response yet, show welcome message
+    if not st.session_state.last_response:
+        render_welcome_message()
+    else:
+        # Display results if available
         render_response(st.session_state.last_response)
-        st.divider()
-
-    # Question input section at bottom
-    st.markdown("### 🔍 Ask Your Question")
+    
+    st.divider()
+    
+    # Question input section at bottom (always visible)
     question = components.render_question_input(EXAMPLE_QUESTIONS)
 
     # Process question if submitted
@@ -298,6 +304,28 @@ def main():
             except Exception as e:
                 components.render_error(f"Error processing question: {str(e)}")
                 return
+
+
+def render_welcome_message():
+    """Render welcome message when no question has been asked yet."""
+    st.markdown("""
+        <div style="
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            margin: 2rem 0;
+        ">
+            <p style="color: #2563eb; font-size: 1.1rem; font-weight: 700; margin: 0;">
+                ✨ Welcome to CityFlow!
+            </p>
+            <p style="color: #475569; font-size: 1rem; margin: 1rem 0 0 0; line-height: 1.6;">
+                Ask any question about government permits and get clear, step-by-step guidance 
+                based on official sources.
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
 
 
 def render_response(response):
@@ -317,20 +345,20 @@ def render_response(response):
         st.markdown("""
             <div style="
                 background: white;
-                padding: 1.2rem;
+                padding: 1.5rem;
                 border-radius: 8px;
                 border-left: 4px solid #2563eb;
                 margin-bottom: 1.5rem;
                 box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
             ">
-                <p style="margin: 0; color: #2563eb; font-weight: 700; font-size: 0.9rem; text-transform: uppercase;">📌 Summary</p>
-                <p style="margin: 0.8rem 0 0 0; color: #1e293b; font-weight: 500; line-height: 1.6;">{}</p>
+                <p style="margin: 0; color: #2563eb; font-weight: 700; font-size: 0.9rem; text-transform: uppercase;">📌 Permit Summary</p>
+                <p style="margin: 1rem 0 0 0; color: #1e293b; font-weight: 500; line-height: 1.6;">{}</p>
             </div>
         """.format(response.summary), unsafe_allow_html=True)
     
     # Required steps (from Agent's checklist)
     if response.steps:
-        st.markdown("#### ✅ Required Steps")
+        st.markdown("<h3 style='color: #2563eb; margin-top: 2rem;'>✅ Required Steps</h3>", unsafe_allow_html=True)
         components.render_required_steps(response.steps)
     
     # Department, Cost, Processing Time in a row
@@ -340,12 +368,13 @@ def render_response(response):
         st.markdown("""
             <div style="
                 background: white;
-                padding: 1rem;
+                padding: 1.2rem;
                 border-radius: 8px;
                 border-left: 4px solid #2563eb;
                 box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+                text-align: center;
             ">
-                <p style="margin: 0; color: #2563eb; font-weight: 700; font-size: 0.8rem; text-transform: uppercase;">🏢 Department</p>
+                <p style="margin: 0; color: #2563eb; font-weight: 700; font-size: 0.8rem; text-transform: uppercase;">🏢 Department/Authority</p>
                 <p style="margin: 0.8rem 0 0 0; color: #1e293b; font-weight: 600;">Local Government / Health Department</p>
             </div>
         """, unsafe_allow_html=True)
@@ -354,12 +383,13 @@ def render_response(response):
         st.markdown("""
             <div style="
                 background: white;
-                padding: 1rem;
+                padding: 1.2rem;
                 border-radius: 8px;
                 border-left: 4px solid #10b981;
                 box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+                text-align: center;
             ">
-                <p style="margin: 0; color: #10b981; font-weight: 700; font-size: 0.8rem; text-transform: uppercase;">💰 Cost</p>
+                <p style="margin: 0; color: #10b981; font-weight: 700; font-size: 0.8rem; text-transform: uppercase;">💰 Estimated Cost</p>
                 <p style="margin: 0.8rem 0 0 0; color: #1e293b; font-weight: 600;">Not available in current sources</p>
             </div>
         """, unsafe_allow_html=True)
@@ -368,12 +398,13 @@ def render_response(response):
         st.markdown("""
             <div style="
                 background: white;
-                padding: 1rem;
+                padding: 1.2rem;
                 border-radius: 8px;
                 border-left: 4px solid #f59e0b;
                 box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+                text-align: center;
             ">
-                <p style="margin: 0; color: #f59e0b; font-weight: 700; font-size: 0.8rem; text-transform: uppercase;">⏱️ Timeline</p>
+                <p style="margin: 0; color: #f59e0b; font-weight: 700; font-size: 0.8rem; text-transform: uppercase;">⏱️ Processing Time</p>
                 <p style="margin: 0.8rem 0 0 0; color: #1e293b; font-weight: 600;">Not available in current sources</p>
             </div>
         """, unsafe_allow_html=True)
@@ -382,24 +413,24 @@ def render_response(response):
     
     # Edge case notes (from Agent)
     if response.notes:
-        st.markdown("#### ⚠️ Special Conditions / Edge Cases")
+        st.markdown("<h3 style='color: #2563eb; margin-top: 2rem;'>⚠️ Special Conditions / Edge Cases</h3>", unsafe_allow_html=True)
         for note in response.notes:
             st.warning(note)
     
     # Sources section
-    st.markdown("#### 📚 Official Sources")
+    st.markdown("<h3 style='color: #2563eb; margin-top: 2rem;'>📚 Official Sources</h3>", unsafe_allow_html=True)
     st.markdown("""
         <div style="
             background: white;
-            padding: 1.2rem;
+            padding: 1.5rem;
             border-radius: 8px;
             border-left: 4px solid #8b5cf6;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         ">
             <ul style="margin: 0; padding-left: 1.5rem; color: #1e293b;">
-                <li><strong>City of Lahore</strong> - <a href="#" style="color: #2563eb; text-decoration: none;">Restaurant Business License 🔗</a></li>
-                <li><strong>Punjab Food Authority</strong> - <a href="#" style="color: #2563eb; text-decoration: none;">Food Business Registration 🔗</a></li>
-                <li><strong>Local Government Zoning</strong> - <a href="#" style="color: #2563eb; text-decoration: none;">Zoning Regulations 🔗</a></li>
+                <li style="margin: 0.5rem 0;"><strong>City of Lahore</strong> - <a href="#" style="color: #2563eb; text-decoration: none; font-weight: 600;">Restaurant Business License 🔗</a></li>
+                <li style="margin: 0.5rem 0;"><strong>Punjab Food Authority</strong> - <a href="#" style="color: #2563eb; text-decoration: none; font-weight: 600;">Food Business Registration 🔗</a></li>
+                <li style="margin: 0.5rem 0;"><strong>Local Government Zoning</strong> - <a href="#" style="color: #2563eb; text-decoration: none; font-weight: 600;">Zoning Regulations 🔗</a></li>
             </ul>
         </div>
     """, unsafe_allow_html=True)
@@ -409,10 +440,10 @@ def render_response(response):
     st.markdown("""
         <div style="
             background: #f0f4ff;
-            padding: 0.8rem;
+            padding: 1rem;
             border-radius: 8px;
             border-left: 4px solid #94a3b8;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
         ">
             <p style="margin: 0; color: #475569; font-size: 0.9rem; font-weight: 500;">
                 ℹ️ CityFlow provides guidance based on the available official sources. 
