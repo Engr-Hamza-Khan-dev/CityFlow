@@ -90,8 +90,8 @@ def render_required_steps(steps: List[Dict[str, Any]]):
         # Get color for this step (cycle through colors)
         color = step_colors[idx % len(step_colors)]
         
-        # Beautiful step card with professional color
-        st.markdown(f"""
+        # Build the HTML content
+        html_content = f"""
             <div style="
                 background: white;
                 padding: 1.2rem;
@@ -120,10 +120,10 @@ def render_required_steps(steps: List[Dict[str, Any]]):
                 </div>
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; margin-top: 1rem;">
-        """, unsafe_allow_html=True)
+        """
         
         if department:
-            st.markdown(f"""
+            html_content += f"""
                     <div style="
                         background: {color['light']};
                         padding: 0.8rem;
@@ -133,10 +133,10 @@ def render_required_steps(steps: List[Dict[str, Any]]):
                         <p style="margin: 0; color: {color['primary']}; font-weight: 700; font-size: 0.75rem; text-transform: uppercase;">🏢 Dept</p>
                         <p style="margin: 0.5rem 0 0 0; color: #1e293b; font-weight: 600; font-size: 0.9rem;">{department}</p>
                     </div>
-            """, unsafe_allow_html=True)
+            """
         
         if cost:
-            st.markdown(f"""
+            html_content += f"""
                     <div style="
                         background: {color['light']};
                         padding: 0.8rem;
@@ -146,10 +146,10 @@ def render_required_steps(steps: List[Dict[str, Any]]):
                         <p style="margin: 0; color: {color['primary']}; font-weight: 700; font-size: 0.75rem; text-transform: uppercase;">💰 Cost</p>
                         <p style="margin: 0.5rem 0 0 0; color: #1e293b; font-weight: 600; font-size: 0.9rem;">{cost}</p>
                     </div>
-            """, unsafe_allow_html=True)
+            """
         
         if timeline:
-            st.markdown(f"""
+            html_content += f"""
                     <div style="
                         background: {color['light']};
                         padding: 0.8rem;
@@ -159,9 +159,14 @@ def render_required_steps(steps: List[Dict[str, Any]]):
                         <p style="margin: 0; color: {color['primary']}; font-weight: 700; font-size: 0.75rem; text-transform: uppercase;">⏱️ Time</p>
                         <p style="margin: 0.5rem 0 0 0; color: #1e293b; font-weight: 600; font-size: 0.9rem;">{timeline}</p>
                     </div>
-            """, unsafe_allow_html=True)
+            """
         
-        st.markdown("</div></div>", unsafe_allow_html=True)
+        html_content += """
+                </div>
+            </div>
+        """
+        
+        st.markdown(html_content, unsafe_allow_html=True)
 
 
 def render_required_documents(documents: List[str]):
