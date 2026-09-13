@@ -19,12 +19,8 @@ def render_header():
 
 def render_question_input(example_questions: List[str]) -> Optional[str]:
     """Render the question input section and return the question or None."""
-    st.subheader("Ask Your Question")
     
     st.markdown("")  # Spacing
-    
-    # Main question input
-    st.markdown("**✍️ Your Question:**")
     
     # Get current value from session state
     current_question = st.session_state.get("user_question", "")
@@ -32,8 +28,8 @@ def render_question_input(example_questions: List[str]) -> Optional[str]:
     question = st.text_area(
         label="question_input_label",
         value=current_question,
-        height=120,
-        placeholder="e.g., What permits do I need to open a restaurant?",
+        height=100,
+        placeholder="Type your question here...",
         key="question_textarea",
         label_visibility="collapsed"
     )
@@ -42,9 +38,9 @@ def render_question_input(example_questions: List[str]) -> Optional[str]:
     st.session_state.user_question = question
     
     # Beautiful search button
-    col1, col2, col3 = st.columns([0.15, 0.7, 0.15])
-    with col1:
-        search_clicked = st.button("🔍 Search", use_container_width=True, type="primary", key="search_btn")
+    col1, col2, col3 = st.columns([0.65, 0.25, 0.1])
+    with col2:
+        search_clicked = st.button("🔍 Send", use_container_width=True, type="primary", key="search_btn")
     
     if search_clicked and question.strip():
         return question.strip()
@@ -69,105 +65,71 @@ def render_permit_summary(summary: str):
 
 
 def render_required_steps(steps: List[Dict[str, Any]]):
-    """Render the required steps checklist with details from Member 2's agent."""
+    """Render the required steps checklist with different professional colors for each step."""
     if not steps:
         return
     
-    st.subheader("✅ Required Steps")
+    # Color palette for steps - professional colors
+    step_colors = [
+        {"primary": "#2563eb", "light": "#dbeafe"},      # Blue
+        {"primary": "#059669", "light": "#d1fae5"},      # Emerald
+        {"primary": "#7c3aed", "light": "#ede9fe"},      # Violet
+        {"primary": "#dc2626", "light": "#fee2e2"},      # Red
+        {"primary": "#d97706", "light": "#fef3c7"},      # Amber
+        {"primary": "#0891b2", "light": "#cffafe"},      # Cyan
+    ]
     
-    for idx, item in enumerate(steps, 1):
-        step_num = item.get("step", idx)
+    for idx, item in enumerate(steps):
+        step_num = item.get("step", idx + 1)
         requirement = item.get("requirement", "")
         department = item.get("department")
         cost = item.get("cost")
         timeline = item.get("timeline")
-        source = item.get("source", "Unknown")
         
-        # Beautiful step card with number badge
-        with st.container():
-            col1, col2 = st.columns([0.08, 0.92])
-            
-            with col1:
-                st.markdown(f"""
-                    <div style="
-                        background: linear-gradient(135deg, #1f5ba8 0%, #2a6fbf 100%);
-                        color: white;
-                        width: 50px;
-                        height: 50px;
-                        border-radius: 50%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        font-weight: bold;
-                        font-size: 1.5rem;
-                        box-shadow: 0 4px 12px rgba(31, 91, 168, 0.3);
-                    ">
-                        {step_num}
-                    </div>
-                """, unsafe_allow_html=True)
-            
-            with col2:
-                st.markdown(f"**{requirement}**")
-            
-            # Details in beautiful columns
-            col1, col2, col3 = st.columns(3)
-            
-            with col1:
-                if department:
-                    st.markdown(f"""
-                        <div style="
-                            background: linear-gradient(135deg, #e7f3ff 0%, #f0f7ff 100%);
-                            padding: 0.8rem;
-                            border-radius: 8px;
-                            border-left: 4px solid #1f5ba8;
-                        ">
-                            <p style="margin: 0; color: #1f5ba8; font-weight: 600; font-size: 0.85rem;">🏢 DEPARTMENT</p>
-                            <p style="margin: 0.5rem 0 0 0; color: #333; font-weight: 600;">{department}</p>
-                        </div>
-                    """, unsafe_allow_html=True)
-            
-            with col2:
-                if cost:
-                    st.markdown(f"""
-                        <div style="
-                            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
-                            padding: 0.8rem;
-                            border-radius: 8px;
-                            border-left: 4px solid #28a745;
-                        ">
-                            <p style="margin: 0; color: #28a745; font-weight: 600; font-size: 0.85rem;">💰 COST</p>
-                            <p style="margin: 0.5rem 0 0 0; color: #333; font-weight: 600;">{cost}</p>
-                        </div>
-                    """, unsafe_allow_html=True)
-            
-            with col3:
-                if timeline:
-                    st.markdown(f"""
-                        <div style="
-                            background: linear-gradient(135deg, #fff9e6 0%, #fffbf0 100%);
-                            padding: 0.8rem;
-                            border-radius: 8px;
-                            border-left: 4px solid #ff9800;
-                        ">
-                            <p style="margin: 0; color: #ff9800; font-weight: 600; font-size: 0.85rem;">⏱️ TIMELINE</p>
-                            <p style="margin: 0.5rem 0 0 0; color: #333; font-weight: 600;">{timeline}</p>
-                        </div>
-                    """, unsafe_allow_html=True)
-            
-            # Source citation in a beautiful box
-            st.markdown(f"""
-                <div style="
-                    background: linear-gradient(135deg, #f5f9fd 0%, #f0f6fc 100%);
-                    padding: 1rem;
-                    border-radius: 8px;
-                    margin-top: 1rem;
-                    border: 1px solid #dde8f0;
-                ">
-                    <p style="margin: 0; color: #1f5ba8; font-weight: 600; font-size: 0.9rem;">📚 SOURCE: <span style="color: #666;">{source}</span></p>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            st.divider()
+        # Get color for this step (cycle through colors)
+        color = step_colors[idx % len(step_colors)]
+        primary_color = color['primary']
+        light_color = color['light']
+        
+        # Build HTML with proper escaping
+        html_parts = []
+        
+        # Main card container opening
+        html_parts.append(f'<div style="background:white;padding:1.2rem;border-radius:8px;border-left:5px solid {primary_color};margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,0.08)">')
+        
+        # Header with number and requirement
+        html_parts.append(f'<div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">')
+        html_parts.append(f'<div style="background:linear-gradient(135deg,{primary_color} 0%,{primary_color}dd 100%);color:white;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:1.2rem;flex-shrink:0">{step_num}</div>')
+        html_parts.append(f'<p style="margin:0;color:#1e293b;font-weight:700;font-size:1rem">{requirement}</p>')
+        html_parts.append('</div>')
+        
+        # Grid for details (dept, cost, timeline)
+        html_parts.append('<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;margin-top:1rem">')
+        
+        if department:
+            html_parts.append(f'<div style="background:{light_color};padding:0.8rem;border-radius:6px;border-left:3px solid {primary_color}">')
+            html_parts.append(f'<p style="margin:0;color:{primary_color};font-weight:700;font-size:0.75rem;text-transform:uppercase">🏢 Dept</p>')
+            html_parts.append(f'<p style="margin:0.5rem 0 0 0;color:#1e293b;font-weight:600;font-size:0.9rem">{department}</p>')
+            html_parts.append('</div>')
+        
+        if cost:
+            html_parts.append(f'<div style="background:{light_color};padding:0.8rem;border-radius:6px;border-left:3px solid {primary_color}">')
+            html_parts.append(f'<p style="margin:0;color:{primary_color};font-weight:700;font-size:0.75rem;text-transform:uppercase">💰 Cost</p>')
+            html_parts.append(f'<p style="margin:0.5rem 0 0 0;color:#1e293b;font-weight:600;font-size:0.9rem">{cost}</p>')
+            html_parts.append('</div>')
+        
+        if timeline:
+            html_parts.append(f'<div style="background:{light_color};padding:0.8rem;border-radius:6px;border-left:3px solid {primary_color}">')
+            html_parts.append(f'<p style="margin:0;color:{primary_color};font-weight:700;font-size:0.75rem;text-transform:uppercase">⏱️ Time</p>')
+            html_parts.append(f'<p style="margin:0.5rem 0 0 0;color:#1e293b;font-weight:600;font-size:0.9rem">{timeline}</p>')
+            html_parts.append('</div>')
+        
+        # Close grids and main container
+        html_parts.append('</div>')
+        html_parts.append('</div>')
+        
+        # Render complete HTML
+        st.markdown(''.join(html_parts), unsafe_allow_html=True)
 
 
 def render_required_documents(documents: List[str]):
