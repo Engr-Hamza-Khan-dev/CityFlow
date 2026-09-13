@@ -158,6 +158,14 @@ st.markdown("""
             background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
         }
         
+        .stButton > button > p {
+            color: white !important;
+        }
+        
+        .stButton > button > span {
+            color: white !important;
+        }
+        
         /* Info boxes - Light blue */
         .stInfo {
             background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%) !important;
@@ -248,7 +256,7 @@ def render_header_with_badge():
     with col2:
         st.markdown("""
             <div>
-                <h1 style="color: #1e40af; margin: 0; font-size: 3rem; font-weight: 900;">CityFlow</h1>
+                <h1 style="color: #0a0c17; margin: 0; font-size: 3rem; font-weight: 900;">CityFlow</h1>
                 <p style="color: #64748b; margin: 0.3rem 0 0 0; font-size: 0.95rem;">AI-Powered Permit Navigator</p>
             </div>
         """, unsafe_allow_html=True)
