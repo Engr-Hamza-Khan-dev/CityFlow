@@ -152,17 +152,29 @@ st.markdown("""
             cursor: pointer !important;
         }
         
+        .stButton > button * {
+            color: white !important;
+        }
+        
+        .stButton > button p {
+            color: white !important;
+        }
+        
+        .stButton > button span {
+            color: white !important;
+        }
+        
+        .stButton > button div {
+            color: white !important;
+        }
+        
         .stButton > button:hover {
             transform: translateY(-2px) !important;
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35) !important;
             background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
         }
         
-        .stButton > button > p {
-            color: white !important;
-        }
-        
-        .stButton > button > span {
+        .stButton > button:hover * {
             color: white !important;
         }
         
@@ -233,6 +245,15 @@ st.markdown("""
         a:hover {
             color: #1d4ed8 !important;
             text-decoration: underline !important;
+        }
+        
+        /* Override Streamlit button text color universally */
+        button {
+            color: white !important;
+        }
+        
+        button * {
+            color: white !important;
         }
     </style>
     """, unsafe_allow_html=True)
