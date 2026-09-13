@@ -1,34 +1,30 @@
 """
 CityFlow Streamlit Application
 
-Main entry point for the CityFlow permit navigator.
+Chat-based interface for permit navigator.
 """
 
 import sys
 from pathlib import Path
+from datetime import datetime
 
 # Add project root to path for imports
 PROJECT_ROOT = Path(__file__).parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 import streamlit as st
-from src.ui import components
 from src.services.cityflow_service import get_service
-from src.config import (
-    EXAMPLE_QUESTIONS,
-    DISCLAIMER,
-    FALLBACK_MESSAGE,
-)
+from src.config import EXAMPLE_QUESTIONS
 
-# Set page config FIRST before any other st commands
+# Set page config
 st.set_page_config(
     page_title="CityFlow",
     page_icon="🏛️",
     layout="wide",
-    initial_sidebar_state="collapsed",
+    initial_sidebar_state="expanded",
 )
 
-# Premium Professional CSS
+# Chat-style UI CSS
 st.markdown("""
     <style>
         * {
@@ -37,278 +33,660 @@ st.markdown("""
             box-sizing: border-box;
         }
         
-        /* Main background - premium gradient */
+        body {
+            background-color: #f5f7fa;
+        }
+        
+        /* Sidebar */
+        [data-testid="stSidebar"] {
+            background: linear-gradient(180deg, #f0f2f7 0%, #e8ecf3 100%);
+        }
+        
+        /* Sidebar header */
+        .sidebar-header {
+            text-align: center;
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid #e0e6f0;
+            margin-bottom: 2rem;
+        }
+        
+        .sidebar-logo-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .sidebar-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1f5ba8;
+        }
+        
+        .sidebar-subtitle {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 0.25rem;
+        }
+        
+        /* Sidebar nav items */
+        .nav-section {
+            padding: 0 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            color: #333;
+            background: white;
+            border: 1px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: rgba(31, 91, 168, 0.08);
+            color: #1f5ba8;
+            border-color: rgba(31, 91, 168, 0.2);
+        }
+        
+        .nav-item.active {
+            background: rgba(31, 91, 168, 0.12);
+            color: #1f5ba8;
+            border-color: #1f5ba8;
+        }
+        
+        /* Main content */
         .main {
-            background: linear-gradient(180deg, #f5f7fc 0%, #eef2f9 100%);
+            background-color: #f5f7fa;
         }
         
-        /* Container */
         .block-container {
-            padding-top: 2rem !important;
-            padding-bottom: 2rem !important;
-            padding-left: 2.5rem !important;
-            padding-right: 2.5rem !important;
-            max-width: 1200px !important;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            max-width: 1400px;
         }
         
-        /* Headers - Professional bold styling */
-        h1 {
-            color: #0f3a7d !important;
-            font-weight: 900 !important;
-            font-size: 2.8rem !important;
-            margin-bottom: 0.3rem !important;
-            letter-spacing: -0.5px !important;
+        /* Chat section */
+        .chat-section {
+            margin-right: 320px;
         }
         
-        h2 {
-            color: #1f5ba8 !important;
-            font-weight: 700 !important;
-            font-size: 1.6rem !important;
-            margin-top: 1.5rem !important;
-            margin-bottom: 1rem !important;
+        /* Chat header */
+        .chat-header {
+            margin-bottom: 1.5rem;
         }
         
-        h3 {
-            color: #2a6fbf !important;
-            font-weight: 700 !important;
-            font-size: 1.2rem !important;
-            margin-top: 1rem !important;
-            margin-bottom: 0.8rem !important;
+        .chat-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1f5ba8;
+            margin: 0 0 0.3rem 0;
         }
         
-        /* Subtitle */
-        .subtitle {
-            color: #2a6fbf !important;
-            font-size: 1.4rem !important;
-            font-weight: 700 !important;
-            margin: 0.3rem 0 0.5rem 0 !important;
+        .chat-subtitle {
+            font-size: 0.95rem;
+            color: #777;
+            margin: 0;
         }
         
-        .description {
-            color: #666 !important;
-            font-size: 1rem !important;
-            margin: 0.5rem 0 0 0 !important;
-            line-height: 1.5 !important;
+        /* Chat messages */
+        .chat-messages {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            min-height: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
         }
         
-        /* Text areas - Premium */
-        .stTextArea label {
-            display: none !important;
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
         }
         
-        .stTextArea textarea {
-            border: 2px solid #d0dce6 !important;
-            border-radius: 12px !important;
-            font-size: 1.05rem !important;
-            padding: 1.2rem !important;
-            background-color: white !important;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            color: #333 !important;
-            font-weight: 500 !important;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 3px;
         }
         
-        .stTextArea textarea:focus {
-            border: 2px solid #1f5ba8 !important;
-            box-shadow: 0 0 0 4px rgba(31, 91, 168, 0.1), 0 4px 12px rgba(31, 91, 168, 0.15) !important;
-            background-color: #fafbfc !important;
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 3px;
         }
         
-        .stTextArea textarea::placeholder {
-            color: #aaa !important;
+        .message-container {
+            display: flex;
+            gap: 0.75rem;
+            animation: slideIn 0.3s ease;
         }
         
-        /* Buttons - Premium gradient */
-        .stButton > button {
-            background: linear-gradient(135deg, #1f5ba8 0%, #2a6fbf 50%, #1f5ba8 100%) !important;
-            color: white !important;
-            border: none !important;
-            border-radius: 10px !important;
-            padding: 0.9rem 2rem !important;
-            font-weight: 700 !important;
-            font-size: 1.05rem !important;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            box-shadow: 0 4px 15px rgba(31, 91, 168, 0.3) !important;
-            letter-spacing: 0.5px !important;
-            text-transform: uppercase !important;
-            cursor: pointer !important;
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
-        .stButton > button:hover {
-            transform: translateY(-4px) !important;
-            box-shadow: 0 8px 25px rgba(31, 91, 168, 0.4) !important;
-            background: linear-gradient(135deg, #2a6fbf 0%, #3477d8 50%, #2a6fbf 100%) !important;
+        .message-container.user {
+            justify-content: flex-end;
         }
         
-        .stButton > button:active {
-            transform: translateY(-1px) !important;
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            flex-shrink: 0;
         }
         
-        /* Info boxes - Premium card style */
-        .stInfo {
-            background: linear-gradient(135deg, #f0f7ff 0%, #e8f2ff 100%) !important;
-            border-left: 5px solid #1f5ba8 !important;
-            border-radius: 12px !important;
-            padding: 1.5rem !important;
-            color: #1f5ba8 !important;
-            font-weight: 500 !important;
-            box-shadow: 0 2px 12px rgba(31, 91, 168, 0.1) !important;
-            margin: 1rem 0 !important;
+        .message-container.user .message-avatar {
+            background: #e3e8f3;
+            color: #1f5ba8;
         }
         
-        /* Warning boxes */
-        .stWarning {
-            background: linear-gradient(135deg, #fff9e6 0%, #fffbf0 100%) !important;
-            border-left: 5px solid #ff9800 !important;
-            border-radius: 12px !important;
-            padding: 1.5rem !important;
-            color: #e65100 !important;
-            font-weight: 500 !important;
-            box-shadow: 0 2px 12px rgba(255, 152, 0, 0.1) !important;
-            margin: 1rem 0 !important;
+        .message-container.assistant .message-avatar {
+            background: linear-gradient(135deg, #1f5ba8 0%, #2a6fbf 100%);
+            color: white;
         }
         
-        /* Error boxes */
-        .stError {
-            background: linear-gradient(135deg, #ffebee 0%, #fff5f5 100%) !important;
-            border-left: 5px solid #dc3545 !important;
-            border-radius: 12px !important;
-            padding: 1.5rem !important;
-            color: #b71c1c !important;
-            font-weight: 500 !important;
-            box-shadow: 0 2px 12px rgba(220, 53, 69, 0.1) !important;
-            margin: 1rem 0 !important;
+        .message-content {
+            max-width: 70%;
         }
         
-        /* Dividers */
-        hr {
-            margin: 2rem 0 !important;
-            border: none !important;
-            height: 1px !important;
-            background: linear-gradient(90deg, transparent, #d0dce6, transparent) !important;
+        .message-bubble {
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.5;
         }
         
-        /* Expanders - Premium */
-        .streamlit-expanderHeader {
-            background: linear-gradient(135deg, #f8fafb 0%, #f5f8fc 100%) !important;
-            border-radius: 10px !important;
-            border: 1px solid #e0e8f0 !important;
-            padding: 1rem !important;
-            transition: all 0.3s ease !important;
-            font-weight: 600 !important;
-            color: #1f5ba8 !important;
+        .message-container.user .message-bubble {
+            background: linear-gradient(135deg, #1f5ba8 0%, #2a6fbf 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
         }
         
-        .streamlit-expanderHeader:hover {
-            background: linear-gradient(135deg, #f0f5fb 0%, #eaf0f9 100%) !important;
-            border-color: #1f5ba8 !important;
-            box-shadow: 0 2px 12px rgba(31, 91, 168, 0.12) !important;
+        .message-container.assistant .message-bubble {
+            background: white;
+            color: #333;
+            border: 1px solid #e0e0e0;
+            border-bottom-left-radius: 4px;
         }
         
-        /* Text styling */
-        p {
-            color: #444 !important;
-            line-height: 1.8 !important;
-            font-size: 1rem !important;
+        .message-time {
+            font-size: 0.75rem;
+            color: #999;
+            margin-top: 0.25rem;
+            text-align: right;
         }
         
-        strong {
-            color: #1f5ba8 !important;
-            font-weight: 700 !important;
+        .message-container.user .message-time {
+            text-align: right;
         }
         
-        /* Caption */
-        .stCaption {
-            color: #888 !important;
-            font-size: 0.9rem !important;
-            font-weight: 500 !important;
+        /* Example questions */
+        .example-questions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
         }
         
-        /* Links */
-        a {
-            color: #1f5ba8 !important;
-            text-decoration: none !important;
-            transition: all 0.3s ease !important;
-            border-bottom: 2px solid transparent !important;
-            font-weight: 600 !important;
+        .example-btn {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-align: center;
+            transition: all 0.2s ease;
+            line-height: 1.4;
         }
         
-        a:hover {
-            color: #2a6fbf !important;
-            border-bottom-color: #2a6fbf !important;
+        .example-btn:hover {
+            background: #f0f5fb;
+            border-color: #1f5ba8;
+            color: #1f5ba8;
+        }
+        
+        /* Chat input */
+        .chat-input-wrapper {
+            display: flex;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            align-items: flex-end;
+        }
+        
+        /* Right sidebar */
+        .right-sidebar {
+            position: fixed;
+            right: 0;
+            top: 60px;
+            width: 300px;
+            padding: 1.5rem;
+            background: white;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+            border-left: 1px solid #e0e0e0;
+        }
+        
+        .sidebar-panel {
+            margin-bottom: 1.5rem;
+        }
+        
+        .panel-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #1f5ba8;
+            margin: 0 0 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .panel-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: #555;
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+        }
+        
+        .panel-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .check-mark {
+            color: #17c65f;
+            font-weight: 700;
+        }
+        
+        .popular-item {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.85rem;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .popular-item:last-child {
+            border-bottom: none;
+        }
+        
+        .popular-item:hover {
+            color: #1f5ba8;
+        }
+        
+        .popular-item-arrow {
+            color: #bbb;
+            font-size: 1.2rem;
+        }
+        
+        .important-panel {
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+            border: 1px solid #c8e6c9;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        
+        .important-panel .panel-title {
+            color: #2e7d32;
+        }
+        
+        .important-panel .panel-item {
+            color: #3d5a40;
+        }
+        
+        /* Hackathon badge */
+        .hackathon-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #17c65f 0%, #1ca85c 100%);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .right-sidebar {
+                display: none;
+            }
+            
+            .chat-section {
+                margin-right: 0;
+            }
         }
     </style>
     """, unsafe_allow_html=True)
 
 
 def initialize_session_state():
-    """Initialize Streamlit session state."""
-    if "user_question" not in st.session_state:
-        st.session_state.user_question = ""
-    if "last_response" not in st.session_state:
-        st.session_state.last_response = None
+    """Initialize session state."""
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    if "current_question" not in st.session_state:
+        st.session_state.current_question = ""
+
+
+def format_timestamp():
+    """Get current time formatted."""
+    return datetime.now().strftime("%I:%M %p")
+
+
+def render_sidebar():
+    """Render the left sidebar."""
+    with st.sidebar:
+        # Header
+        st.markdown("""
+            <div class="sidebar-header">
+                <div class="sidebar-logo-icon">🏛️</div>
+                <div class="sidebar-title">CityFlow</div>
+                <div class="sidebar-subtitle">AI-Powered Permit Navigator</div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        # Navigation
+        st.markdown("""
+            <div class="nav-section">
+        """, unsafe_allow_html=True)
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            if st.button("💬 Chat", use_container_width=True):
+                st.session_state.current_page = "chat"
+        
+        with col2:
+            if st.button("ℹ️ About", use_container_width=True):
+                st.session_state.current_page = "about"
+        
+        with col3:
+            if st.button("❓ Help", use_container_width=True):
+                st.session_state.current_page = "help"
+        
+        st.markdown("</div>", unsafe_allow_html=True)
+        
+        st.divider()
+        
+        # Sidebar content
+        st.markdown("""
+            <div style="text-align: center; padding: 2rem 1rem; color: #666; font-size: 0.9rem; line-height: 1.6;">
+                Understand government permits in plain English.
+            </div>
+        """, unsafe_allow_html=True)
+
+
+def render_right_sidebar():
+    """Render the right sidebar with tips and popular questions."""
+    right_sidebar_html = """
+    <div class="right-sidebar">
+        <!-- Quick Tips -->
+        <div class="sidebar-panel">
+            <div class="panel-title">⚡ Quick Tips</div>
+            <div class="panel-item">
+                <span class="check-mark">✓</span>
+                <span>Be as specific as you can</span>
+            </div>
+            <div class="panel-item">
+                <span class="check-mark">✓</span>
+                <span>Use plain, natural language</span>
+            </div>
+            <div class="panel-item">
+                <span class="check-mark">✓</span>
+                <span>You can ask follow-up questions</span>
+            </div>
+            <div class="panel-item">
+                <span class="check-mark">✓</span>
+                <span>We'll show you official sources</span>
+            </div>
+        </div>
+        
+        <!-- Popular Questions -->
+        <div class="sidebar-panel">
+            <div class="panel-title">🔥 Popular Questions</div>
+            <div class="popular-item">
+                <span>Restaurant permits?</span>
+                <span class="popular-item-arrow">→</span>
+            </div>
+            <div class="popular-item">
+                <span>Home business permit?</span>
+                <span class="popular-item-arrow">→</span>
+            </div>
+            <div class="popular-item">
+                <span>Building requirements?</span>
+                <span class="popular-item-arrow">→</span>
+            </div>
+            <div class="popular-item">
+                <span>Permit timeline?</span>
+                <span class="popular-item-arrow">→</span>
+            </div>
+        </div>
+        
+        <!-- Important -->
+        <div class="sidebar-panel important-panel">
+            <div class="panel-title">🛡️ Important</div>
+            <div class="panel-item">
+                CityFlow provides guidance based on available official sources. Requirements may change, so verify important information with the relevant authority.
+            </div>
+        </div>
+    </div>
+    """
+    st.markdown(right_sidebar_html, unsafe_allow_html=True)
+
+
+def render_chat_area():
+    """Render the main chat area."""
+    st.markdown("""
+        <div class="chat-header">
+            <div class="chat-title">Ask About Your Permit</div>
+            <div class="chat-subtitle">Type your question in plain English and I'll help you find the right permits, requirements and next steps.</div>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    # Chat messages area
+    if st.session_state.messages:
+        st.markdown('<div class="chat-messages">', unsafe_allow_html=True)
+        for message in st.session_state.messages:
+            if message["role"] == "user":
+                st.markdown(f"""
+                    <div class="message-container user">
+                        <div class="message-content">
+                            <div class="message-bubble">{message["content"]}</div>
+                            <div class="message-time">{message.get("timestamp", "")}</div>
+                        </div>
+                        <div class="message-avatar">👤</div>
+                    </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                    <div class="message-container assistant">
+                        <div class="message-avatar">🤖</div>
+                        <div class="message-content">
+                            <div class="message-bubble">{message["content"]}</div>
+                            <div class="message-time">{message.get("timestamp", "")}</div>
+                        </div>
+                    </div>
+                """, unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+    else:
+        # Show example questions if no messages
+        st.markdown("""
+            <div style="text-align: center; padding: 2rem 1rem; color: #999;">
+                <div style="font-size: 0.95rem; margin-bottom: 1.5rem;">Try asking:</div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("I want to open a restaurant. What permits do I need?", use_container_width=True, key="ex1"):
+                st.session_state.messages.append({
+                    "role": "user",
+                    "content": "I want to open a restaurant. What permits do I need?",
+                    "timestamp": format_timestamp()
+                })
+                st.rerun()
+        
+        with col2:
+            if st.button("How do I get a home business permit?", use_container_width=True, key="ex2"):
+                st.session_state.messages.append({
+                    "role": "user",
+                    "content": "How do I get a home business permit?",
+                    "timestamp": format_timestamp()
+                })
+                st.rerun()
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("What are the requirements for a building permit?", use_container_width=True, key="ex3"):
+                st.session_state.messages.append({
+                    "role": "user",
+                    "content": "What are the requirements for a building permit?",
+                    "timestamp": format_timestamp()
+                })
+                st.rerun()
+        
+        with col2:
+            if st.button("How long does it take to get a permit?", use_container_width=True, key="ex4"):
+                st.session_state.messages.append({
+                    "role": "user",
+                    "content": "How long does it take to get a permit?",
+                    "timestamp": format_timestamp()
+                })
+                st.rerun()
+
+
+def render_input_area():
+    """Render the chat input area."""
+    col1, col2, col3 = st.columns([0.85, 0.05, 0.1])
+    
+    with col1:
+        question = st.text_input(
+            "Type your question here...",
+            key="chat_input",
+            placeholder="Type your question here...",
+            label_visibility="collapsed"
+        )
+    
+    with col2:
+        st.markdown("")  # Spacing
+    
+    with col3:
+        send_clicked = st.button("Send", use_container_width=True, type="primary")
+    
+    return question if send_clicked and question.strip() else None
+
+
+def process_question(question: str):
+    """Process the user's question and get response from backend."""
+    try:
+        service = get_service()
+        
+        # Add user message to chat
+        st.session_state.messages.append({
+            "role": "user",
+            "content": question,
+            "timestamp": format_timestamp()
+        })
+        
+        # Get response from service
+        response = service.process_question(question)
+        
+        # Format response for display
+        if response.is_fallback:
+            answer_text = f"⚠️ {response.summary}"
+            if response.notes:
+                answer_text += "\n\n" + "\n".join(response.notes)
+        else:
+            answer_text = response.summary
+            
+            if response.steps:
+                answer_text += "\n\n**Required Steps:**"
+                for i, step in enumerate(response.steps, 1):
+                    requirement = step.get("requirement", "")
+                    department = step.get("department", "")
+                    cost = step.get("cost", "")
+                    timeline = step.get("timeline", "")
+                    
+                    answer_text += f"\n{i}. {requirement}"
+                    if department:
+                        answer_text += f"\n   • Department: {department}"
+                    if cost:
+                        answer_text += f"\n   • Cost: {cost}"
+                    if timeline:
+                        answer_text += f"\n   • Timeline: {timeline}"
+            
+            if response.notes:
+                answer_text += "\n\n**Important Notes:**"
+                for note in response.notes:
+                    answer_text += f"\n• {note}"
+        
+        # Add assistant response to chat
+        st.session_state.messages.append({
+            "role": "assistant",
+            "content": answer_text,
+            "timestamp": format_timestamp()
+        })
+        
+    except Exception as e:
+        error_message = f"❌ Error: {str(e)}"
+        st.session_state.messages.append({
+            "role": "assistant",
+            "content": error_message,
+            "timestamp": format_timestamp()
+        })
 
 
 def main():
-    """Main Streamlit application."""
-    # Initialize
+    """Main application."""
     initialize_session_state()
-    components.render_header()
-
-    # Get service
-    try:
-        service = get_service()
-    except Exception as e:
-        components.render_error(
-            f"Failed to initialize service: {str(e)}. "
-            "Make sure the RAG index is built: `python scripts/build_faiss_index.py`"
-        )
-        return
-
-    # Display results ABOVE input if available
-    if st.session_state.last_response:
-        render_response(st.session_state.last_response)
-        st.divider()
-
-    # Question input section
-    question = components.render_question_input(EXAMPLE_QUESTIONS)
-
-    # Process question if submitted
-    if question:
-        with st.spinner("Processing your question..."):
-            try:
-                response = service.process_question(question)
-                st.session_state.last_response = response
-                st.rerun()  # Refresh to show results above
-            except Exception as e:
-                components.render_error(f"Error processing question: {str(e)}")
-                return
-
-
-def render_response(response):
-    """Render the CityFlow response with Agent-generated checklist."""
     
-    # Fallback state
-    if response.is_fallback:
-        components.render_fallback()
-        if response.notes:
-            st.subheader("📝 Notes")
-            for note in response.notes:
-                st.info(note)
-        return
+    # Render sidebar
+    render_sidebar()
     
-    # Summary
-    if response.summary:
-        components.render_permit_summary(response.summary)
+    # Main content area
+    col_main, col_right = st.columns([1, 0], gap="large")
     
-    # Required steps (from Agent's checklist)
-    if response.steps:
-        components.render_required_steps(response.steps)
+    with col_main:
+        render_chat_area()
+        
+        # Input area
+        question = render_input_area()
+        
+        if question:
+            process_question(question)
+            st.rerun()
     
-    # Edge case notes (from Agent)
-    if response.notes:
-        components.render_edge_cases(response.notes)
+    # Right sidebar (overlay)
+    render_right_sidebar()
 
 
 if __name__ == "__main__":
